@@ -2,6 +2,7 @@ import cv2
 from PIL import Image
 import pytesseract
 import os
+from pdf2image import convert_from_path
 
 # ap = argparse.ArgumentParser()
 # ap.add_argument("-i", "--image", required=True,
@@ -11,10 +12,11 @@ import os
 # args = vars(ap.parse_args())
 
 # load the example image and convert it to grayscale
-sample_image = "/Users/nickpredey/Desktop/Funny Screenshots/42424439_10155445558740946_1193867897445810176_o.jpg"
 pdf = '/Users/nickpredey/EDF_MAN/data/CME/DailyBulletin_pdf_20180627123/Section01B_Summary_Volume_And_Open_Interest_FX_Futures_And_Options.pdf'
 pdf_jpg = '/Users/nickpredey/EDF_MAN/data/CME/Section01_Exchange_Overall_Volume_And_Open_Interest-page-001.jpg'
-image = cv2.imread(pdf_jpg)
+pdf_path = r'C:\Users\npredey\Downloads\CME\DailyBulletin_pdf_20180627123\Section42_10YrNote_5yrNote_2yrNote_30YrBond_Options.pdf'
+jpg = convert_from_path(pdf_path, 500)
+image = cv2.imread(jpg)
 print(image)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
