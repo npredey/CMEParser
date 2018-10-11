@@ -1,7 +1,4 @@
 import re
-import fnmatch
-
-path = "output.txt"
 
 # Gets element in form of i.e. "DEC19"
 regex_date = '([a-zA-Z][a-zA-Z][a-zA-Z]\d\d)'
@@ -49,7 +46,7 @@ def align_call_row(header, row):
     """
     header_list = header.split(',')
     # print(str(header_list))
-    row_list = row.split(',')
+    row_list = row.strip().split(',')
     if "CAB" in str(row_list):
         print(row)
     # print(str(row_list))
@@ -59,6 +56,9 @@ def align_call_row(header, row):
     next_element_index += 1
     for i in range(len(header_list)):
         header_col = header_list[i].strip()
+        if header_col == 'OPEN INTEREST CHANGE':
+            next_row_element = next(row_list_iter, 'DONE')
+            continue
         next_row_element = next(row_list_iter, 'DONE')
         next_element_index += 1
         # print(next_row_element)
@@ -71,11 +71,21 @@ def align_call_row(header, row):
             print(split_next_element)
             # row_list.pop(next_element_index)
             oi = split_next_element[0]
-            row_list[i] = row_list[i] + ' ' + oi
+            oi_change_sign = re.search('([+-])', row_list[i])
+            if oi_change_sign:
+                oi = '{}{}'.format(oi_change_sign.group(1), oi)
+            print("DDDDD", row_list[i])
+            digits = re.findall(r'\d+', row_list[i])
+            if len(digits) > 0:
+                row_list[i] = digits[0]
+            if oi == "UNCH":
+                oi = "0"
+            row_list[i+1] = oi
             # Sometimes this is the last element, so we can't just assign the next value in the list without an out of
             # bounds exception
-            if i + 1 < len(row_list):
-                row_list[i + 1] = ' '.join(split_next_element[1:])
+            if i + 2 < len(row_list):
+                row_list.insert(i + 2, ' '.join(split_next_element[1:]))
+                # row_list[i + 1] = ' '.join(split_next_element[1:])
             else:
                 row_list.insert(i + 1, ' '.join(split_next_element[1:]))
 
@@ -121,15 +131,15 @@ def merge_headers(top_header, bottom_header, bottom_header_value='DISCOUNT % PT.
     return merged_header
 
 
-def main():
-    f = open(path, 'r')
-    lines = f.readlines()
-
+def read(filepath):
+    f = open(filepath, 'r')
+    lines = [line for line in f.readlines() if not line.isspace()]
+    output_file_name = '{}_parsed.csv'.format(filepath.split('.')[0])
     i = 0
     ed_call_options = False
     ed_futures = False
     strike_match_header = ''
-    strike_call_file = open('strikes.csv', 'w+')
+    strike_call_file = open(output_file_name, 'w+')
     for line in lines:
         if "EURO DOLLAR FUTURES" in line:
             ed_futures = True
@@ -153,6 +163,8 @@ def main():
             stripped_ed_call_headers = strip_header(lines[i:i + 3])
             print(stripped_ed_call_headers)
             options_headers = merge_headers(stripped_ed_call_headers[1], stripped_ed_call_headers[-1], '& PT.CHGE.')
+            oi_index = get_header_element_index(options_headers, "OPEN INTEREST")
+            options_headers.insert(oi_index + 1, "OPEN INTEREST CHANGE")
             new_first = options_headers[0].split(' ')
             new_first[:1] = [' '.join(new_first[:1])]
             print(new_first)
