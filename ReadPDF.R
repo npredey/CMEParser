@@ -10,6 +10,6 @@ if (length(args)==0) {
 }
 text_file <- args[1]
 txt <- pdf_text(text_file)
-fileConn<-file("output.txt")
+fileConn<-file("output2.txt")
 writeLines(txt, fileConn)
 close(fileConn)
