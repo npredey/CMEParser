@@ -1,4 +1,5 @@
 import re
+import os
 
 # Gets element in form of i.e. "DEC19"
 regex_date = '([a-zA-Z][a-zA-Z][a-zA-Z]\d\d)'
@@ -131,10 +132,13 @@ def merge_headers(top_header, bottom_header, bottom_header_value='DISCOUNT % PT.
     return merged_header
 
 
-def read(filepath):
+def parse(filepath, output_directory=''):
     f = open(filepath, 'r')
     lines = [line for line in f.readlines() if not line.isspace()]
-    output_file_name = '{}_parsed.csv'.format(filepath.split('.')[0])
+    output_file_name = os.path.join(output_directory, '{}_parsed.csv'.format(filepath.split('.')[0]))
+    if not os.path.exists(output_file_name):
+        print("Path does not exist")
+        exit()
     i = 0
     ed_call_options = False
     ed_futures = False

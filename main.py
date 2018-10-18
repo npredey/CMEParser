@@ -1,5 +1,5 @@
 from historical import get_historical_data
-from read_oi import read
+from read_oi import parse
 import sys
 
 # get_historical_data(output_directory="/Users/nickpredey/EDF_MAN/data/CME/")
@@ -14,7 +14,7 @@ def main():
         print("Filepath must be specified")
         exit()
     print(filepath)
-    read(filepath)
+    parse(filepath)
 
 
 main()

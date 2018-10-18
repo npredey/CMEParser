@@ -14,6 +14,7 @@ txt <- pdf_text(text_file)
 date <- trimws(toString(Sys.Date()))
 filename <- tools::file_path_sans_ext(basename(text_file))
 fileConn<-file(paste(filename, date, ".txt", sep=''))
+print(fileConn)
 writeLines(txt, fileConn)
 close(fileConn)
 
